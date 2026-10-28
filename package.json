@@ -1,13 +1,13 @@
 {
   "name": "openwhip",
   "version": "1.1.0-sl.1",
-  "description": "Látigo en pantalla para bromear (fork reducido de OpenWhip, solo macOS)",
+  "description": "Látigo en pantalla para bromear (fork reducido de OpenWhip, macOS y Windows)",
   "license": "MIT",
   "main": "main.js",
   "bin": {
     "openwhip": "bin/openwhip.js"
   },
-  "os": ["darwin"],
+  "os": ["darwin", "win32"],
   "engines": {
     "node": ">=18.0.0"
   },

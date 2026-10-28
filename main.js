@@ -8,6 +8,9 @@ let spawnQueued = false;
 if (process.platform === 'darwin') app.dock.hide();
 
 function getTrayIcon() {
+  if (process.platform === 'win32') {
+    return nativeImage.createFromPath(path.join(__dirname, 'icon', 'icon.ico'));
+  }
   const img = nativeImage
     .createFromPath(path.join(__dirname, 'icon', 'Template.png'))
     .resize({ width: 18, height: 18 });
@@ -33,8 +36,10 @@ function createOverlay() {
     },
   });
   overlay.setAlwaysOnTop(true, 'screen-saver');
-  // Visible también sobre apps en pantalla completa y en cualquier escritorio
-  overlay.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  // macOS: visible también sobre apps en pantalla completa y en cualquier escritorio
+  if (process.platform === 'darwin') {
+    overlay.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  }
   overlayReady = false;
   overlay.loadFile('overlay.html');
   overlay.webContents.on('did-finish-load', () => {
@@ -77,7 +82,7 @@ app.whenReady().then(() => {
   const trayMenu = Menu.buildFromTemplate([
     { label: 'Quit', click: () => app.quit() },
   ]);
-  // En macOS, setContextMenu se traga el click izquierdo: menú solo con click derecho
+  // setContextMenu se traga el click izquierdo en macOS: menú solo con click derecho
   tray.on('click', toggleOverlay);
   tray.on('right-click', () => tray.popUpContextMenu(trayMenu));
 });

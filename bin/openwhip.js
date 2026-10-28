@@ -13,6 +13,7 @@ try {
 const child = spawn(electronBinary, [path.resolve(__dirname, '..')], {
   detached: true,
   stdio: 'ignore',
+  windowsHide: true,
 });
 
 child.on('error', (err) => {
