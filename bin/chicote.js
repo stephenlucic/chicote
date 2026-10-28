@@ -17,7 +17,7 @@ const child = spawn(electronBinary, [path.resolve(__dirname, '..')], {
 });
 
 child.on('error', (err) => {
-  console.error('Failed to start openwhip:', err.message);
+  console.error('Failed to start chicote:', err.message);
   process.exit(1);
 });
 

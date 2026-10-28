@@ -78,7 +78,7 @@ ipcMain.on('hide-overlay', () => { if (overlay) overlay.hide(); });
 // ── App lifecycle ───────────────────────────────────────────────────────────
 app.whenReady().then(() => {
   tray = new Tray(getTrayIcon());
-  tray.setToolTip('OpenWhip - click for whip');
+  tray.setToolTip('Chicote - click para el látigo');
   const trayMenu = Menu.buildFromTemplate([
     { label: 'Quit', click: () => app.quit() },
   ]);

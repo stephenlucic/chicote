@@ -1,32 +1,50 @@
-# OpenWhip (versión reducida)
+# Chicote
 
-Fork mínimo de [GitFrog1111/OpenWhip](https://github.com/GitFrog1111/OpenWhip). Solo el látigo. macOS y Windows.
+Un látigo en pantalla para bromear. Lo sacas desde el ícono, lo agitas con el mouse y suena el latigazo. Solo eso: no toca el teclado ni otras apps.
 
-## Cambios respecto al original
-
-- Click izquierdo en el ícono de la barra de menú / bandeja del sistema abre el látigo (en el original no funcionaba en macOS). El menú "Quit" pasa al click derecho.
-- El latigazo es solo visual y sonoro: no manda Ctrl-C ni escribe mensajes. No necesita permiso de Accesibilidad.
-- En macOS, el látigo se ve también sobre apps en pantalla completa.
-- Se quitó el soporte para Linux y `koffi`.
-- Electron actualizado de 33 a 44.
+Funciona en macOS y Windows.
 
 ## Instalar
 
-Requiere Node.js 18+ y git.
+Necesitas [Node.js](https://nodejs.org) 18 o superior y [git](https://git-scm.com).
 
 ```bash
-git clone https://github.com/stephenlucic/openwhip.git
-cd openwhip
+git clone https://github.com/stephenlucic/chicote.git
+cd chicote
 npm install
 npm install -g .
-openwhip
 ```
 
-## Uso
+En Windows, ejecuta esos comandos en PowerShell o en el Símbolo del sistema.
 
-- Click en el ícono (barra de menú en macOS, bandeja del sistema en Windows): aparece el látigo.
-- Click: suelta el látigo.
-- Click derecho en el ícono: Quit.
+## Usar
+
+```bash
+chicote
+```
+
+- **Sacar el látigo:** click en el ícono. En macOS está en la barra de menú (arriba a la derecha); en Windows, en la bandeja del sistema (abajo a la derecha, puede estar dentro de la flechita `^`).
+- **Latigazo:** mueve el mouse rápido.
+- **Soltar el látigo:** click en cualquier parte.
+- **Cerrar Chicote:** click derecho en el ícono → Quit.
+
+## Desinstalar
+
+```bash
+npm uninstall -g chicote
+```
+
+Y borra la carpeta donde lo clonaste.
+
+## Créditos
+
+Basado en [OpenWhip](https://github.com/GitFrog1111/OpenWhip) de GitFrog1111 (MIT). Cambios respecto al original:
+
+- El click izquierdo en el ícono abre el látigo (en el original no funcionaba en macOS) y el menú pasa al click derecho.
+- El latigazo es solo visual y sonoro: el original mandaba Ctrl-C y escribía mensajes en la terminal. Ya no necesita permiso de Accesibilidad.
+- En macOS, el látigo se ve también sobre apps en pantalla completa.
+- Sin soporte para Linux.
+- Electron actualizado de 33 a 44.
 
 ## Licencia
 
