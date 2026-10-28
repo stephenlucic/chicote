@@ -449,6 +449,9 @@ window.bridge.onDropWhip(() => {
   if (whip && !dropping) dropping = true;
 });
 
+// Sensibilidad elegida en el menú del ícono
+window.bridge.onSetCrackSpeed(v => { P.crackSpeed = v; });
+
 </script>
 </body>
 </html>
