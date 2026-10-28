@@ -9,13 +9,10 @@ Funciona en macOS y Windows.
 Necesitas [Node.js](https://nodejs.org) 18 o superior y [git](https://git-scm.com).
 
 ```bash
-git clone https://github.com/stephenlucic/chicote.git
-cd chicote
-npm install
-npm install -g .
+npm install -g github:stephenlucic/chicote
 ```
 
-En Windows, ejecuta esos comandos en PowerShell o en el Símbolo del sistema.
+En Windows, ejecútalo en PowerShell o en el Símbolo del sistema.
 
 ## Usar
 
@@ -28,13 +25,17 @@ chicote
 - **Soltar el látigo:** click en cualquier parte.
 - **Cerrar Chicote:** click derecho en el ícono → Quit.
 
+La primera vez que lo ejecutas descarga Electron, así que puede tardar un poco en aparecer el ícono.
+
 ## Desinstalar
 
 ```bash
 npm uninstall -g chicote
 ```
 
-Y borra la carpeta donde lo clonaste.
+## Actualizar
+
+Vuelve a ejecutar el comando de instalación.
 
 ## Créditos
 
