@@ -15,20 +15,34 @@ const SENSITIVITIES = [
   { id: 'maxima',  label: 'Máxima',          crackSpeed: 130 },
 ];
 const DEFAULT_SENSITIVITY = 'media';
+
+// ── Estilos del látigo (deben existir en SKINS de overlay.html) ─────────────
+const SKINS = [
+  { id: 'clasico',  label: 'Clásico' },
+  { id: 'cuero',    label: 'Cuero' },
+  { id: 'rojo',     label: 'Rojo' },
+  { id: 'dorado',   label: 'Dorado' },
+  { id: 'neon',     label: 'Neón' },
+  { id: 'arcoiris', label: 'Arcoíris' },
+];
+const DEFAULT_SKIN = 'clasico';
+
 const settingsPath = () => path.join(app.getPath('userData'), 'settings.json');
 let sensitivity = DEFAULT_SENSITIVITY;
+let skin = DEFAULT_SKIN;
 
 function loadSettings() {
   try {
     const s = JSON.parse(fs.readFileSync(settingsPath(), 'utf8'));
     if (SENSITIVITIES.some(x => x.id === s.sensitivity)) sensitivity = s.sensitivity;
+    if (SKINS.some(x => x.id === s.skin)) skin = s.skin;
   } catch {}
 }
 
 function saveSettings() {
   try {
     fs.mkdirSync(path.dirname(settingsPath()), { recursive: true });
-    fs.writeFileSync(settingsPath(), JSON.stringify({ sensitivity }));
+    fs.writeFileSync(settingsPath(), JSON.stringify({ sensitivity, skin }));
   } catch (e) {
     console.warn('no se pudo guardar settings:', e.message);
   }
@@ -38,6 +52,17 @@ function sendCrackSpeed() {
   if (!overlay || !overlayReady) return;
   const { crackSpeed } = SENSITIVITIES.find(x => x.id === sensitivity);
   overlay.webContents.send('set-crack-speed', crackSpeed);
+}
+
+function sendSkin() {
+  if (!overlay || !overlayReady) return;
+  overlay.webContents.send('set-skin', skin);
+}
+
+function setSkin(id) {
+  skin = id;
+  saveSettings();
+  sendSkin();
 }
 
 function setSensitivity(id) {
@@ -86,6 +111,7 @@ function createOverlay() {
   overlay.webContents.on('did-finish-load', () => {
     overlayReady = true;
     sendCrackSpeed();
+    sendSkin();
     if (spawnQueued && overlay && overlay.isVisible()) {
       spawnQueued = false;
       overlay.webContents.send('spawn-whip');
@@ -130,6 +156,15 @@ app.whenReady().then(() => {
         type: 'radio',
         checked: s.id === sensitivity,
         click: () => setSensitivity(s.id),
+      })),
+    },
+    {
+      label: 'Estilo',
+      submenu: SKINS.map(s => ({
+        label: s.label,
+        type: 'radio',
+        checked: s.id === skin,
+        click: () => setSkin(s.id),
       })),
     },
     { type: 'separator' },

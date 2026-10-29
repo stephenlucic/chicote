@@ -67,6 +67,19 @@ const P = {
 };
 
 // ══════════════════════════════════════════════════════════════════════════════
+//  SKINS — colores del látigo. t va de 0 (mango) a 1 (punta)
+// ══════════════════════════════════════════════════════════════════════════════
+const SKINS = {
+  clasico:  { halo: '#fff',    core: () => '#111' },
+  cuero:    { halo: '#f3e2c7', core: t => `hsl(28, 55%, ${lerp(16, 38, t)}%)` },
+  rojo:     { halo: '#fff',    core: t => `hsl(355, 80%, ${lerp(30, 48, t)}%)` },
+  dorado:   { halo: '#3a2a00', core: t => `hsl(45, 90%, ${lerp(38, 60, t)}%)`, glow: 'rgba(255,200,0,0.6)' },
+  neon:     { halo: '#001a1a', core: () => '#00fff0', glow: '#00fff0' },
+  arcoiris: { halo: '#fff',    core: (t, time) => `hsl(${(t * 300 + time / 8) % 360}, 90%, 55%)` },
+};
+let skin = SKINS.clasico;
+
+// ══════════════════════════════════════════════════════════════════════════════
 
 const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
@@ -389,7 +402,7 @@ function draw() {
   // White: thin halo on full spline, then extra thickness only over handle links.
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
-  ctx.strokeStyle = '#fff';
+  ctx.strokeStyle = skin.halo;
   if (whip.length >= 2) {
     ctx.beginPath();
     ctx.moveTo(whip[0].x, whip[0].y);
@@ -414,9 +427,14 @@ function draw() {
     }
   }
 
-  ctx.strokeStyle = '#111';
+  const time = performance.now();
+  if (skin.glow) {
+    ctx.shadowColor = skin.glow;
+    ctx.shadowBlur = 12;
+  }
   for (let i = 0; i < whip.length - 1; i++) {
     const t = i / Math.max(1, whip.length - 2);
+    ctx.strokeStyle = skin.core(t, time);
     const extra = i < P.handleThickSegments ? P.handleExtraWidth : 0;
     ctx.lineWidth = lerp(P.lineWidthHandle, P.lineWidthTip, t) + extra;
     const { cp1x, cp1y, cp2x, cp2y, x2, y2 } = whipSegmentBezier(whip, i);
@@ -425,6 +443,7 @@ function draw() {
     ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x2, y2);
     ctx.stroke();
   }
+  ctx.shadowBlur = 0;
 }
 
 // ── Main loop ───────────────────────────────────────────────────────────────
@@ -448,6 +467,9 @@ window.bridge.onSpawnWhip(() => {
 window.bridge.onDropWhip(() => {
   if (whip && !dropping) dropping = true;
 });
+
+// Estilo elegido en el menú del ícono
+window.bridge.onSetSkin(id => { skin = SKINS[id] || SKINS.clasico; });
 
 // Sensibilidad elegida en el menú del ícono
 window.bridge.onSetCrackSpeed(v => { P.crackSpeed = v; });

@@ -24,6 +24,7 @@ chicote
 - **Latigazo:** mueve el mouse rápido.
 - **Soltar el látigo:** click en cualquier parte.
 - **Sensibilidad del sonido:** click derecho en el ícono → Sensibilidad. Mientras más alta, menos hay que mover el mouse para que suene. Por defecto está en Media.
+- **Estilo del látigo:** click derecho en el ícono → Estilo. Hay Clásico, Cuero, Rojo, Dorado, Neón y Arcoíris.
 - **Cerrar Chicote:** click derecho en el ícono → Quit.
 
 La primera vez que lo ejecutas descarga Electron, así que puede tardar un poco en aparecer el ícono.
@@ -44,6 +45,7 @@ Basado en [OpenWhip](https://github.com/GitFrog1111/OpenWhip) de GitFrog1111 (MI
 
 - El click izquierdo en el ícono abre el látigo (en el original no funcionaba en macOS) y el menú pasa al click derecho.
 - El latigazo es solo visual y sonoro: el original mandaba Ctrl-C y escribía mensajes en la terminal. Ya no necesita permiso de Accesibilidad.
+- Menú de estilos para cambiar el color del látigo.
 - Menú de sensibilidad para regular cuánto hay que mover el mouse para que suene.
 - En macOS, el látigo se ve también sobre apps en pantalla completa.
 - Sin soporte para Linux.

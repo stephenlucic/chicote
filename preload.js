@@ -5,5 +5,6 @@ contextBridge.exposeInMainWorld('bridge', {
   hideOverlay: () => ipcRenderer.send('hide-overlay'),
   onSpawnWhip: (fn) => ipcRenderer.on('spawn-whip', () => fn()),
   onDropWhip: (fn) => ipcRenderer.on('drop-whip', () => fn()),
+  onSetSkin: (fn) => ipcRenderer.on('set-skin', (_e, v) => fn(v)),
   onSetCrackSpeed: (fn) => ipcRenderer.on('set-crack-speed', (_e, v) => fn(v)),
 });
