@@ -76,6 +76,89 @@ const SKINS = {
   dorado:   { halo: '#3a2a00', core: t => `hsl(45, 90%, ${lerp(38, 60, t)}%)`, glow: 'rgba(255,200,0,0.6)' },
   neon:     { halo: '#001a1a', core: () => '#00fff0', glow: '#00fff0' },
   arcoiris: { halo: '#fff',    core: (t, time) => `hsl(${(t * 300 + time / 8) % 360}, 90%, 55%)` },
+
+  // Estilos con efectos (ver PARTICLES más abajo)
+  electrico: {
+    halo: '#3b2a00',
+    core: t => `hsl(54, 100%, ${lerp(50, 62, t)}%)`,
+    glow: '#fff36b',
+    emit: (pts) => {
+      if (Math.random() < 0.25) {
+        const p = randomPoint(pts);
+        spawnSpark(p.x, p.y, '#fff36b', 2.5, 18);
+      }
+      if (Math.random() < 0.03) spawnBolt(pts[pts.length - 1], 40, '#fff9b0', 1.5);
+    },
+    onCrack: (tip) => {
+      for (let i = 0; i < 4; i++) spawnBolt(tip, 90, '#fff36b', 3);
+      for (let i = 0; i < 14; i++) spawnSpark(tip.x, tip.y, '#ffffff', 6, 22);
+    },
+  },
+  aura: {
+    halo: '#5a3d00',
+    core: t => `hsl(48, 100%, ${lerp(55, 72, t)}%)`,
+    glow: '#ffd21a',
+    underlay: (pts, time) => {
+      // Aura que vibra alrededor del látigo
+      const flicker = 1 + 0.25 * Math.sin(time / 40) + 0.15 * Math.sin(time / 17);
+      strokeWhip(pts, 26 * flicker, 'rgba(255, 210, 40, 0.18)');
+      strokeWhip(pts, 15 * flicker, 'rgba(255, 240, 150, 0.30)');
+    },
+    emit: (pts) => {
+      for (let i = 0; i < 2; i++) {
+        const p = randomPoint(pts);
+        addParticle({
+          x: p.x + (Math.random() - 0.5) * 16, y: p.y,
+          vx: (Math.random() - 0.5) * 0.6, vy: -1.5 - Math.random() * 2.5,
+          size: 1.5 + Math.random() * 2.5, life: 35, color: Math.random() < 0.3 ? '#ffffff' : '#ffd21a',
+        });
+      }
+    },
+    onCrack: (tip) => {
+      spawnRing(tip.x, tip.y, '#ffe680', 70);
+      for (let i = 0; i < 20; i++) spawnSpark(tip.x, tip.y, '#ffd21a', 7, 28);
+    },
+  },
+  energia: {
+    halo: '#0a2a6b',
+    core: t => `hsl(195, 100%, ${lerp(70, 88, t)}%)`,
+    glow: '#2fa8ff',
+    emit: (pts) => {
+      // Estela de energía en la punta
+      const tip = pts[pts.length - 1];
+      for (let i = 0; i < 3; i++) {
+        addParticle({
+          x: tip.x + (Math.random() - 0.5) * 6, y: tip.y + (Math.random() - 0.5) * 6,
+          vx: (Math.random() - 0.5) * 0.8, vy: (Math.random() - 0.5) * 0.8,
+          size: 4 + Math.random() * 4, life: 22, color: Math.random() < 0.5 ? '#9fe8ff' : '#2fa8ff', glow: true,
+        });
+      }
+    },
+    onCrack: (tip) => {
+      spawnRing(tip.x, tip.y, '#bdf3ff', 110);
+      spawnRing(tip.x, tip.y, '#2fa8ff', 70);
+      addParticle({ x: tip.x, y: tip.y, vx: 0, vy: 0, size: 40, life: 10, color: '#e6fbff', glow: true });
+    },
+  },
+  fuego: {
+    halo: '#3a0d00',
+    core: t => `hsl(${lerp(10, 42, t)}, 100%, ${lerp(42, 58, t)}%)`,
+    glow: '#ff6a00',
+    emit: (pts) => {
+      // Llamas en la punta
+      const tip = pts[pts.length - 1];
+      for (let i = 0; i < 4; i++) {
+        addParticle({
+          x: tip.x + (Math.random() - 0.5) * 10, y: tip.y + (Math.random() - 0.5) * 6,
+          vx: (Math.random() - 0.5) * 1.2, vy: -1.2 - Math.random() * 2,
+          size: 5 + Math.random() * 6, life: 26, flame: true,
+        });
+      }
+    },
+    onCrack: (tip) => {
+      for (let i = 0; i < 24; i++) spawnSpark(tip.x, tip.y, Math.random() < 0.5 ? '#ffb300' : '#ff4a00', 8, 34);
+    },
+  },
 };
 let skin = SKINS.clasico;
 
@@ -128,6 +211,104 @@ function segLen(i) {
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const lerp = (a, b, t) => a + (b - a) * t;
+
+// ── PARTICLES — efectos de los estilos ──────────────────────────────────────
+const MAX_PARTICLES = 500;
+let particles = [];
+
+function addParticle(p) {
+  if (particles.length >= MAX_PARTICLES) particles.shift();
+  p.maxLife = p.life;
+  particles.push(p);
+}
+
+function randomPoint(pts) {
+  // Puntos de la mitad hacia la punta, donde se ve el movimiento
+  return pts[Math.floor(pts.length * (0.3 + Math.random() * 0.7)) % pts.length];
+}
+
+function spawnSpark(x, y, color, speed, life) {
+  const a = Math.random() * Math.PI * 2;
+  const v = speed * (0.4 + Math.random() * 0.6);
+  addParticle({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, size: 1.5 + Math.random() * 2, life, color, gravity: 0.15 });
+}
+
+function spawnRing(x, y, color, radius) {
+  addParticle({ x, y, vx: 0, vy: 0, size: radius, life: 14, color, ring: true });
+}
+
+function spawnBolt(from, length, color, width) {
+  // Rayo zigzagueante en una dirección al azar
+  const a = Math.random() * Math.PI * 2;
+  const steps = 6;
+  const points = [{ x: from.x, y: from.y }];
+  for (let i = 1; i <= steps; i++) {
+    const d = (length * i) / steps;
+    const jitter = (Math.random() - 0.5) * length * 0.35;
+    points.push({
+      x: from.x + Math.cos(a) * d - Math.sin(a) * jitter,
+      y: from.y + Math.sin(a) * d + Math.cos(a) * jitter,
+    });
+  }
+  addParticle({ x: from.x, y: from.y, vx: 0, vy: 0, size: width, life: 8, color, bolt: points });
+}
+
+function updateParticles() {
+  for (const p of particles) {
+    p.x += p.vx; p.y += p.vy;
+    if (p.gravity) p.vy += p.gravity;
+    p.life--;
+  }
+  particles = particles.filter(p => p.life > 0);
+}
+
+function drawParticles() {
+  if (!particles.length) return;
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  for (const p of particles) {
+    const k = p.life / p.maxLife; // 1 → 0
+    ctx.globalAlpha = k;
+    if (p.bolt) {
+      ctx.strokeStyle = p.color;
+      ctx.lineWidth = p.size;
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.moveTo(p.bolt[0].x, p.bolt[0].y);
+      for (const q of p.bolt) ctx.lineTo(q.x, q.y);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    } else if (p.ring) {
+      ctx.strokeStyle = p.color;
+      ctx.lineWidth = 4 * k;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * (1 - k) + 6, 0, Math.PI * 2);
+      ctx.stroke();
+    } else {
+      // Llamas: amarillo → naranjo → rojo a medida que se apagan
+      ctx.fillStyle = p.flame ? `hsl(${lerp(0, 50, k)}, 100%, ${lerp(35, 60, k)}%)` : p.color;
+      if (p.glow) { ctx.shadowColor = p.color; ctx.shadowBlur = 14; }
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, Math.max(0.5, p.size * (p.flame ? k : 1)), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+  }
+  ctx.restore();
+}
+
+function strokeWhip(pts, width, color) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for (let i = 0; i < pts.length - 1; i++) {
+    const { cp1x, cp1y, cp2x, cp2y, x2, y2 } = whipSegmentBezier(pts, i);
+    ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x2, y2);
+  }
+  ctx.stroke();
+}
 
 /** Point on Catmull–Rom spline (extrapolated ends) for index i in `pts`. */
 function catmullPoint(pts, i) {
@@ -375,9 +556,12 @@ function update() {
     if (now - whipSpawnTime >= P.firstCrackGraceMs && now - lastCrackTime > P.crackCooldownMs) {
       lastCrackTime = now;
       playCrackSound();
+      if (skin.onCrack) skin.onCrack(tip);
       window.bridge.whipCrack();
     }
   }
+
+  if (!dropping && skin.emit) skin.emit(whip, Date.now());
 
   // If dropping, check if everything fell off screen
   if (dropping && whip.every(p => p.y > H + 60)) {
@@ -397,7 +581,11 @@ function draw() {
   ctx.fillStyle = `rgba(0,0,0,${P.bgAlpha})`;
   ctx.fillRect(0, 0, W, H);
 
-  if (!whip) return;
+  if (!whip) { drawParticles(); return; }
+
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  if (skin.underlay && whip.length >= 2) skin.underlay(whip, performance.now());
 
   // White: thin halo on full spline, then extra thickness only over handle links.
   ctx.lineCap = 'round';
@@ -444,11 +632,13 @@ function draw() {
     ctx.stroke();
   }
   ctx.shadowBlur = 0;
+  drawParticles();
 }
 
 // ── Main loop ───────────────────────────────────────────────────────────────
 function loop() {
   update();
+  updateParticles();
   draw();
   requestAnimationFrame(loop);
 }
@@ -469,7 +659,7 @@ window.bridge.onDropWhip(() => {
 });
 
 // Estilo elegido en el menú del ícono
-window.bridge.onSetSkin(id => { skin = SKINS[id] || SKINS.clasico; });
+window.bridge.onSetSkin(id => { skin = SKINS[id] || SKINS.clasico; particles = []; });
 
 // Sensibilidad elegida en el menú del ícono
 window.bridge.onSetCrackSpeed(v => { P.crackSpeed = v; });

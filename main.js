@@ -24,6 +24,10 @@ const SKINS = [
   { id: 'dorado',   label: 'Dorado' },
   { id: 'neon',     label: 'Neón' },
   { id: 'arcoiris', label: 'Arcoíris' },
+  { id: 'electrico', label: '⚡ Eléctrico' },
+  { id: 'aura',      label: '✨ Aura dorada' },
+  { id: 'energia',   label: '🔵 Energía azul' },
+  { id: 'fuego',     label: '🔥 Fuego' },
 ];
 const DEFAULT_SKIN = 'clasico';
 
@@ -160,12 +164,16 @@ app.whenReady().then(() => {
     },
     {
       label: 'Estilo',
-      submenu: SKINS.map(s => ({
-        label: s.label,
-        type: 'radio',
-        checked: s.id === skin,
-        click: () => setSkin(s.id),
-      })),
+      submenu: SKINS.flatMap(s => [
+        // Separa los colores simples de los estilos con efectos
+        ...(s.id === 'electrico' ? [{ type: 'separator' }] : []),
+        {
+          label: s.label,
+          type: 'radio',
+          checked: s.id === skin,
+          click: () => setSkin(s.id),
+        },
+      ]),
     },
     { type: 'separator' },
     { label: 'Quit', click: () => app.quit() },

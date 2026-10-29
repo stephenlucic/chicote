@@ -24,7 +24,7 @@ chicote
 - **Latigazo:** mueve el mouse rápido.
 - **Soltar el látigo:** click en cualquier parte.
 - **Sensibilidad del sonido:** click derecho en el ícono → Sensibilidad. Mientras más alta, menos hay que mover el mouse para que suene. Por defecto está en Media.
-- **Estilo del látigo:** click derecho en el ícono → Estilo. Hay Clásico, Cuero, Rojo, Dorado, Neón y Arcoíris.
+- **Estilo del látigo:** click derecho en el ícono → Estilo. Hay colores simples (Clásico, Cuero, Rojo, Dorado, Neón, Arcoíris) y estilos con efectos: Eléctrico (chispas y rayos), Aura dorada, Energía azul y Fuego.
 - **Cerrar Chicote:** click derecho en el ícono → Quit.
 
 La primera vez que lo ejecutas descarga Electron, así que puede tardar un poco en aparecer el ícono.
